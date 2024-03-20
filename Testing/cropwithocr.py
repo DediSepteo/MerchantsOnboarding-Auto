@@ -18,7 +18,7 @@ class ImageUploaderApp:
         self.ocr_button = tk.Button(self.root, text="Perform OCR", command=self.perform_ocr)
         self.ocr_button.pack()
 
-        self.reader = easyocr.Reader(['en'])  # Initialize EasyOCR reader for English language
+        self.reader = easyocr.Reader(['en', 'ch_sim'])  # Initialize EasyOCR reader for English language
         self.start_x = None
         self.start_y = None
         self.rectangle = None
