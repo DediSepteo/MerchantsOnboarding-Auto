@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog
-from PIL import ImageTk, Image
+from PIL import ImageTk, Image, ImageEnhance
 import easyocr
 import numpy as np
 
@@ -29,7 +29,6 @@ class ImageUploaderApp:
                                                filetypes=(("Image files", "*.png;*.jpg;*.jpeg;*.gif"), ("All files", "*.*")))
         if file_path:
             self.image = Image.open(file_path)
-            #self.image = self.image.resize((1280, 900))
             self.photo = ImageTk.PhotoImage(self.image)
             self.canvas.create_image(0, 0, anchor=tk.NW, image=self.photo)
             self.canvas.bind("<ButtonPress-1>", self.start_cropping)
@@ -50,16 +49,23 @@ class ImageUploaderApp:
         end_x = self.canvas.canvasx(event.x)
         end_y = self.canvas.canvasy(event.y)
         self.cropped_image = self.image.crop((self.start_x, self.start_y, end_x, end_y))
+        self.cropped_image = self.sharpen_image(self.cropped_image)  # Sharpen the cropped image
+        self.cropped_image = self.cropped_image.resize((980, 700))  # Resize the cropped image
         self.cropped_photo = ImageTk.PhotoImage(self.cropped_image)
         self.canvas.delete("all")
         self.canvas.create_image(0, 0, anchor=tk.NW, image=self.cropped_photo)
 
+    def sharpen_image(self, image):
+        enhancer = ImageEnhance.Sharpness(image)
+        sharpened_image = enhancer.enhance(1.5)  # Adjust the enhancement factor as needed
+        return sharpened_image
+
     def perform_ocr(self):
         if self.cropped_image:
-            resized_image = self.cropped_image.resize((1200, 800))
+            enhanced_image = ImageEnhance.Contrast(self.cropped_image).enhance(1.5)
 
             # Convert the cropped image to a numpy array
-            cropped_image_array = np.array(resized_image)
+            cropped_image_array = np.array(enhanced_image)
 
             # Perform OCR on the numpy array
             result = self.reader.readtext(cropped_image_array, detail = 0)
