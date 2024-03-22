@@ -1,4 +1,4 @@
-# Image Uploader with OCR
+# Image Uploader with OCR STILL WIP
 
 This is a Python application for uploading images, cropping them, and performing OCR (Optical Character Recognition) using EasyOCR library.
 
@@ -32,7 +32,7 @@ This is a Python application for uploading images, cropping them, and performing
 
 ## Usage
 
-1. Run the application:
+1. Run the application: ***NOT READY YET***
 
     ```bash
     python main.py
