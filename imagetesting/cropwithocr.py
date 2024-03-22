@@ -1,7 +1,6 @@
 '''
 Scanning of menu by cropping and storing in excel file
 '''
-
 import tkinter as tk
 from tkinter import filedialog
 from tkinter import messagebox
@@ -10,7 +9,6 @@ import easyocr
 import numpy as np
 import openpyxl
 import os
-
 
 class ImageUploaderApp:
     def __init__(self, root):
@@ -50,16 +48,12 @@ class ImageUploaderApp:
         if file_path:
             self.excel_file = file_path
 
-
     def create_new_excel(self):
         file_path = filedialog.asksaveasfilename(title="Save As",
                                                  defaultextension=".xlsx",
                                                  filetypes=[("Excel files", "*.xlsx")])
         if file_path:
             self.excel_file = file_path
-
-    # Other methods remain unchanged
-
 
     def upload_image(self):
         file_path = filedialog.askopenfilename(title="Select Image",
@@ -106,6 +100,11 @@ class ImageUploaderApp:
             self.cropped_photo = ImageTk.PhotoImage(self.cropped_image)
             self.canvas.delete("all")
             self.canvas.create_image(0, 0, anchor=tk.NW, image=self.cropped_photo)
+    
+    def sharpen_image(self, image):
+        enhancer = ImageEnhance.Sharpness(image)
+        sharpened_image = enhancer.enhance(1.5)  # Adjust the enhancement factor as needed
+        return sharpened_image
 
     def perform_ocr(self):
         if self.cropped_image:
@@ -118,24 +117,31 @@ class ImageUploaderApp:
             result = self.reader.readtext(cropped_image_array, detail=0)
 
             if self.excel_file:
-                # Open existing or create new workbook
-                wb = openpyxl.load_workbook(self.excel_file) if os.path.exists(self.excel_file) else openpyxl.Workbook()
-                ws = wb.active
-                ws.title = "OCR Results"
+                # Open existing workbook or create new one
+                if os.path.exists(self.excel_file):
+                    wb = openpyxl.load_workbook(self.excel_file)
+                else:
+                    wb = openpyxl.Workbook()
+                    wb.remove(wb.active)  # Remove default sheet
 
-                # Write OCR results to Excel
+                ws = wb.create_sheet("OCR Results", 0) if "OCR Results" not in wb.sheetnames else wb["OCR Results"]
+
+                # Find the last row with data
+                last_row = ws.max_row
+
+                # Write OCR results to Excel starting from the next row
                 for i, text in enumerate(result, start=1):
-                    ws.cell(row=i, column=1, value=text)
+                    ws.cell(row=last_row + i, column=1, value=text)
 
                 # Save the workbook
                 wb.save(self.excel_file)
-                print("OCR results saved to", self.excel_file)
+                print("OCR results appended to", self.excel_file)
             else:
                 print("No Excel file selected.")
         else:
             print("No cropped image available for OCR")
 
-    
+        
 def main():
     root = tk.Tk()
     app = ImageUploaderApp(root)
