@@ -7,11 +7,13 @@ class ImageUploaderApp:
         self.root = root
         self.root.title("Image Uploader")
 
-        self.canvas = tk.Canvas(self.root, width=1200, height=900)
+        self.canvas = tk.Canvas(self.root, width=1200, height=600)
         self.canvas.pack()
 
         self.upload_button = tk.Button(self.root, text="Upload Image", command=self.upload_image)
         self.upload_button.pack()
+
+
 
     def upload_image(self):
         file_path = filedialog.askopenfilename(title="Select Image",
